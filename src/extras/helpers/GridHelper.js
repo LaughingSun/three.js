@@ -10,37 +10,48 @@ import { Color } from '../../math/Color';
  */
 
 function GridHelper( size, divisions, color1, color2 ) {
-
-	size = size || 10;
-	divisions = divisions || 10;
-	color1 = new Color( color1 !== undefined ? color1 : 0x444444 );
-	color2 = new Color( color2 !== undefined ? color2 : 0x888888 );
-
-	var center = divisions / 2;
-	var step = ( size * 2 ) / divisions;
-	var vertices = [], colors = [];
-
-	for ( var i = 0, j = 0, k = - size; i <= divisions; i ++, k += step ) {
-
-		vertices.push( - size, 0, k, size, 0, k );
-		vertices.push( k, 0, - size, k, 0, size );
-
-		var color = i === center ? color1 : color2;
-
-		color.toArray( colors, j ); j += 3;
-		color.toArray( colors, j ); j += 3;
-		color.toArray( colors, j ); j += 3;
-		color.toArray( colors, j ); j += 3;
-
+	var geometry = new THREE.Geometry()
+		, vertices = geometry.vertices
+		, center, step, color, i
+		;
+	if ( size instanceof Object ) {
+		i = size;
+		size = i.size || 10;
+		'step' in i && (step = i.step);
+		'divisions' in i && (divisions = i.divisions);
+		'color' in i && (color2 = i.color);
+		color1 = 'center' in i ? i.center : color2;
+	} else {
+		size = size || 10;
 	}
+	
+	step ? (divisions = size * 2 / step) : (step = size * 2 / (divisions || (divisions = 10)));
+	(color1 || (color1 = 0x444444)) instanceof Color || (color1 = new Color(color1));
+	(color2 || (color2 = 0x888888)) instanceof Color || (color2 = new Color(color2));
+	center = step * (divisions / 2 | 0);
+	vertices = [], colors = [];
 
-	var geometry = new BufferGeometry();
+	for ( i = -size; i <= size; i += step ) {
+		if ( i === center ) continue;
+		geometry.vertices.push( new THREE.Vector3( -size, 0, i ) );
+		geometry.vertices.push( new THREE.Vector3(  size, 0, i ) );
+
+		geometry.vertices.push( new THREE.Vector3( i, 0, -size ) );
+		geometry.vertices.push( new THREE.Vector3( i, 0,  size ) );
+	}
+	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color2 } ) );
+	
+	geometry = new THREE.Geometry();
+	vertices = geometry.vertices;
+	geometry.vertices.push( new THREE.Vector3( -size, 0, center ) );
+	geometry.vertices.push( new THREE.Vector3(  size, 0, center ) );
+
+	geometry.vertices.push( new THREE.Vector3( center, 0, -size ) );
+	geometry.vertices.push( new THREE.Vector3( center, 0,  size ) );
+	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color1 } ) );
+
 	geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
-
-	var material = new LineBasicMaterial( { vertexColors: VertexColors } );
-
-	LineSegments.call( this, geometry, material );
 
 }
 
