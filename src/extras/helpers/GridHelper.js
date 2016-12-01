@@ -32,8 +32,9 @@ function GridHelper( size, divisions, color1, color2 ) {
 	(color1 || (color1 = 0x444444)) instanceof Color || (color1 = new Color(color1));
 	(color2 || (color2 = 0x888888)) instanceof Color || (color2 = new Color(color2));
 	center = step * (divisions / 2 | 0);
-	vertices = [], colors = [];
-
+	
+	geometry = new THREE.Geometry();
+	vertices = geometry.vertices;
 	for ( i = -size; i <= size; i += step ) {
 		if ( i === center ) continue;
 		geometry.vertices.push( new THREE.Vector3( -size, 0, i ) );
@@ -45,7 +46,6 @@ function GridHelper( size, divisions, color1, color2 ) {
 //	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color2 } ) );
 	lines = new THREE.LineSegments( geometry, new LineBasicMaterial( { color: color2 } ) );
 	Group.prototype.add.call( this, lines );
-//	group.add( lines );
 	
 	geometry = new THREE.Geometry();
 	vertices = geometry.vertices;
