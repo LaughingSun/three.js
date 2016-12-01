@@ -1,3 +1,4 @@
+import { Group } from '../../objects/Group';
 import { LineSegments } from '../../objects/LineSegments';
 import { VertexColors } from '../../constants';
 import { LineBasicMaterial } from '../../materials/LineBasicMaterial';
@@ -10,8 +11,10 @@ import { Color } from '../../math/Color';
  */
 
 function GridHelper( size, divisions, color1, color2 ) {
-	var geometry = new THREE.Geometry()
+	var group = new THREE.Group()
+		, geometry = new THREE.Geometry()
 		, vertices = geometry.vertices
+		, lines
 		, center, step, color, i
 		;
 	if ( size instanceof Object ) {
@@ -39,7 +42,10 @@ function GridHelper( size, divisions, color1, color2 ) {
 		geometry.vertices.push( new THREE.Vector3( i, 0, -size ) );
 		geometry.vertices.push( new THREE.Vector3( i, 0,  size ) );
 	}
-	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color2 } ) );
+//	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color2 } ) );
+	lines = new THREE.LineSegments( geometry, new LineBasicMaterial( { color: color2 } ) );
+	Group.prototype.add.call( this, lines );
+//	group.add( lines );
 	
 	geometry = new THREE.Geometry();
 	vertices = geometry.vertices;
@@ -48,7 +54,9 @@ function GridHelper( size, divisions, color1, color2 ) {
 
 	geometry.vertices.push( new THREE.Vector3( center, 0, -size ) );
 	geometry.vertices.push( new THREE.Vector3( center, 0,  size ) );
-	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color1 } ) );
+//	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color1 } ) );
+	lines = new THREE.LineSegments( geometry, new LineBasicMaterial( { color: color1 } ) );
+	Group.prototype.add.call( this, lines );
 
 	geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
